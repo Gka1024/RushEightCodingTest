@@ -24,12 +24,12 @@ class Program
     // 참고 : https://hsh12345.tistory.com/221
     public List<Station> Dijkstra(Station start, Station dest)
     {
-        int nodesCount = Subway.SubwayList.GetAllStationCount();
+        List<Station> stations = SubwayList.GetAllStation();
         Dictionary<Station, bool> isVisited = new();
         Dictionary<Station, int> totalDistance = new();
         Dictionary<Station, Station?> parent = new();
 
-        foreach(Station station in SubwayList.GetAllStation())
+        foreach (Station station in stations)
         {
             isVisited.Add(station, false);
             totalDistance.Add(station, int.MaxValue);
@@ -37,30 +37,65 @@ class Program
 
         parent.Add(start, null);
 
-        while(true)
+        while (true)
         {
             Station? now = null;
             int closest = int.MaxValue;
 
-            for(int i = 0; i < nodesCount; i++)
+            foreach (Station station in stations)
             {
-                if(now == null) break;
+                if (isVisited[station]) continue;
 
-                if(isVisited.TryGetValue(now, out bool value) && value) continue;
-                
-                if(totalDistance.TryGetValue(now, out int dist) && dist == int.MaxValue) continue;
+                if (totalDistance.TryGetValue(station, out int dist) && dist == int.MaxValue) continue;
 
-                if(dist < closest)
+                if (dist < closest)
                 {
                     closest = dist;
-                    // ???
+                    now = station;
                 }
 
             }
+
+            if (now == null) break;
+
+            isVisited[now] = true;
+
+            foreach (Edge edge in now.edges)
+            {
+                Station next = edge.destination;
+                if(isVisited[next]) continue;
+                int nextDistance = totalDistance[now] + edge.time;
+
+                if(nextDistance < totalDistance[next])
+                {
+                    totalDistance[next] = nextDistance;
+                    parent[next] = now;
+                }
+            }
         }
 
-        
+        return CalcPathFromParent(parent, dest);
     }
+
+    private List<Station> CalcPathFromParent(Dictionary<Station, Station?> parent, Station dest)
+    {
+        Console.WriteLine($"{dest}까지 최단 경로");
+        List<Station> path = new();
+        Station? temp = dest;
+
+        while(temp != null)
+        {
+            path.Add(temp);
+
+            if(parent[temp] == temp) break;
+
+            temp = parent[temp];
+        }
+
+        path.Reverse();
+        return path;
+    }
+
 
 
 }
