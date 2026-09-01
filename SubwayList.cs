@@ -8,7 +8,7 @@ namespace Subway
 
         public static void Initialize()
         {
-            for (int i = 1; i <= 6; i++)
+            for (int i = 0; i <= 6; i++)
             {
                 stationsByLine[i] = new();
             }
@@ -25,6 +25,11 @@ namespace Subway
         private static void Register(Station station)
         {
             stationsByLine[station.Line].Add(station);
+
+            if (!stationsByName.ContainsKey(station.Name))
+            {
+                stationsByName.Add(station.Name, new List<Station>());
+            }
             stationsByName[station.Name].Add(station);
         }
 
@@ -37,22 +42,33 @@ namespace Subway
         public static List<Station> GetAllStation()
         {
             List<Station> stations = new();
-            for (int i = 1; i <= 6; i++)
+            for (int i = 0; i <= 6; i++)
             {
                 stations.AddRange(stationsByLine[i]);
             }
             return stations;
         }
 
-        public static Station SetVirtualStation(List<Station> stations)
+        public static Station SetVirtualStartStation(List<Station> stations)
         {
-            Station start = new Station("시작", 1);
-            foreach(Station station in stations)
+            Station start = new Station("시작", 0);
+            foreach (Station station in stations)
             {
                 start.edges.Add(new Edge(station, 0));
             }
-
+            stationsByLine[0].Add(start);
             return start;
+        }
+
+        public static Station SetVirtualEndStation(List<Station> stations)
+        {
+            Station end = new Station("도착", 0);
+            foreach (Station station in stations)
+            {
+                station.edges.Add(new Edge(end, 0));
+            }
+            stationsByLine[0].Add(end);
+            return end;
         }
 
 

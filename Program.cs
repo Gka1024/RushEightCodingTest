@@ -17,12 +17,24 @@ class Program
             return;
         }
 
-        Console.WriteLine(start + end);
+        Station startStation = SubwayList.SetVirtualStartStation(SubwayList.GetStation(start));
+        Station endStation = SubwayList.SetVirtualEndStation(SubwayList.GetStation(end));
+
+        List<Station> Path = Dijkstra(startStation, endStation);
+
+        string pathString = "";
+
+        foreach(Station station in Path)
+        {
+            pathString += station.Name + " -> ";
+        }
+
+        Console.WriteLine(pathString);
     }
 
 
     // 참고 : https://hsh12345.tistory.com/221
-    public List<Station> Dijkstra(Station start, Station dest)
+    public static List<Station> Dijkstra(Station start, Station dest)
     {
         List<Station> stations = SubwayList.GetAllStation();
         Dictionary<Station, bool> isVisited = new();
@@ -36,7 +48,7 @@ class Program
         }
 
         totalDistance[start] = 0;
-        parent.Add(start, null);
+        parent[start] = start;
 
         while (true)
         {
@@ -77,14 +89,20 @@ class Program
         return CalcPathFromParent(parent, dest);
     }
 
-    private List<Station> CalcPathFromParent(Dictionary<Station, Station?> parent, Station dest)
-    {
-        Console.WriteLine($"{dest}까지 최단 경로");
+    private static List<Station> CalcPathFromParent(Dictionary<Station, Station?> parent, Station dest)
+    { // Parent (출발, 출발), (출발, 이촌), (신용산, 이촌), (삼각지, 신용산), (도착, 삼각지), dest : 도착
+        Console.WriteLine($"{dest.Name}까지 최단 경로");
         List<Station> path = new();
         Station? temp = dest;
 
         while(temp != null)
         {
+            if(!parent.ContainsKey(temp))
+            {
+                Console.WriteLine("경로를 찾을 수 없습니다.");
+                return new List<Station>();
+            }
+
             path.Add(temp);
 
             if(parent[temp] == temp) break;
