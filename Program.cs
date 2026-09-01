@@ -35,6 +35,7 @@ class Program
             totalDistance.Add(station, int.MaxValue);
         }
 
+        totalDistance[start] = 0;
         parent.Add(start, null);
 
         while (true)
@@ -53,7 +54,6 @@ class Program
                     closest = dist;
                     now = station;
                 }
-
             }
 
             if (now == null) break;
@@ -95,7 +95,4 @@ class Program
         path.Reverse();
         return path;
     }
-
-
-
 }

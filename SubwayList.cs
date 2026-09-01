@@ -3,6 +3,7 @@ namespace Subway
     public static class SubwayList
     {
         public static Dictionary<int, List<Station>> stationsByLine = new();
+        public static Dictionary<string, List<Station>> stationsByName = new();
 
 
         public static void Initialize()
@@ -12,7 +13,7 @@ namespace Subway
                 stationsByLine[i] = new();
             }
 
-            RegisterStation4(stationsByLine[4]);
+            RegisterStation4();
         }
 
         private static void Connect(Station A, Station B, int time)
@@ -21,14 +22,16 @@ namespace Subway
             B.edges.Add(new Edge(A, time));
         }
 
-        public static int GetAllStationCount()
+        private static void Register(Station station)
         {
-            int count = 0;
-            for (int i = 1; i <= 6; i++)
-            {
-                count += stationsByLine[i].Count;
-            }
-            return count;
+            stationsByLine[station.Line].Add(station);
+            stationsByName[station.Name].Add(station);
+        }
+
+        public static List<Station> GetStation(string name)
+        {
+            stationsByName.TryGetValue(name, out var stations);
+            return stations ?? new();
         }
 
         public static List<Station> GetAllStation()
@@ -41,8 +44,19 @@ namespace Subway
             return stations;
         }
 
+        public static Station SetVirtualStation(List<Station> stations)
+        {
+            Station start = new Station("시작", 1);
+            foreach(Station station in stations)
+            {
+                start.edges.Add(new Edge(station, 0));
+            }
 
-        private static void RegisterStation4(List<Station> line)
+            return start;
+        }
+
+
+        private static void RegisterStation4()
         {
             // ==== 역 생성
             Station ichon = new Station("이촌", 4);
@@ -72,17 +86,17 @@ namespace Subway
 
 
             // ==== 역 추가
-            line.Add(ichon);
-            line.Add(sinyongsan);
-            line.Add(samgakji);
-            line.Add(sukdaeipgue);
-            line.Add(seoulstation);
-            line.Add(hoihyun);
-            line.Add(myeongdong);
-            line.Add(chungmuro);
-            line.Add(DHCP);
-            line.Add(dongdaemun);
-            line.Add(hyehwa);
+            Register(ichon);
+            Register(sinyongsan);
+            Register(samgakji);
+            Register(sukdaeipgue);
+            Register(seoulstation);
+            Register(hoihyun);
+            Register(myeongdong);
+            Register(chungmuro);
+            Register(DHCP);
+            Register(dongdaemun);
+            Register(hyehwa);
         }
 
 
